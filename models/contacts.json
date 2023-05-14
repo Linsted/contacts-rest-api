@@ -84,16 +84,6 @@
     "phone": "3"
   },
   {
-    "id": "7_NXnSncS",
-    "name": "1",
-    "email": "2"
-  },
-  {
-    "id": "GcKhxkICL",
-    "name": "1",
-    "email": "2"
-  },
-  {
     "id": "C3WKk2hiw",
     "name": "тест",
     "email": "6",
@@ -102,7 +92,13 @@
   {
     "id": "hCgefCXAy",
     "name": "тест",
-    "email": "6",
-    "phone": "3"
+    "email": "test",
+    "phone": "test"
+  },
+  {
+    "id": "928y-DEjX",
+    "name": "test",
+    "email": "test",
+    "phone": "test"
   }
 ]
