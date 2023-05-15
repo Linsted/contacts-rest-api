@@ -32,11 +32,11 @@ const deleteContact = async (req, res ) => {
 
 const addTheContact = async (req, res) => { 
 
-    const schema = Joi.object({
-      name: Joi.string(),
-      email: Joi.string(),
-      phone: Joi.string()
-    });
+   const schema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().pattern(/^\d{10}$/).required()
+});
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
       throw HttpError(400, "Missing required field")
@@ -51,8 +51,8 @@ const addTheContact = async (req, res) => {
 const updateTheContact = async (req, res) => { 
     const schema = Joi.object({
       name: Joi.string(),
-      email: Joi.string(),
-      phone: Joi.string()
+      email: Joi.string().email(),
+      phone: Joi.string().pattern(/^\d{10}$/)
     }).or('name', 'email', 'phone').required();
 
     const { error } = schema.validate(req.body, { abortEarly: false });
