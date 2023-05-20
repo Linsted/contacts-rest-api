@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const app = require('./app');
 
-const DB_HOST = "mongodb+srv://Linsted:k2uxyQfnoguhSdb5@cluster0.x75ivqb.mongodb.net/db-contacts?retryWrites=true&w=majority"
+const DB_HOST = process.env;
 
 mongoose.connect(DB_HOST)
   .then(() => {
@@ -18,6 +18,6 @@ mongoose.connect(DB_HOST)
 
 
 
-// pass:   k2uxyQfnoguhSdb5
+
 
 
