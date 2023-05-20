@@ -6,10 +6,10 @@ const { listContacts, getContactById,removeContact, addContact, updateContact } 
 
 
 
+
+
 const fetchAllContacts = async (req, res) => {
     const contacts = await listContacts();
-    console.log("test")
-    console.log(contacts)
   res.json(contacts);
 
 };
