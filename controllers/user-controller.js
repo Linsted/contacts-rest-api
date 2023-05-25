@@ -40,7 +40,7 @@ const loginUser = async (req, res) => {
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: "23h",
   });
-
+  await User.findOneAndUpdate(user._id, { token });
   res.status(200).json({
     token,
     user: {
@@ -50,7 +50,14 @@ const loginUser = async (req, res) => {
   });
 };
 
+const logoutUser = async (req, res) => {
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: "" });
+  res.json({ message: " Successfully logged out" });
+};
+
 module.exports = {
   registerUser: ctrlWrapper(registerUser),
   loginUser: ctrlWrapper(loginUser),
+  logoutUser: ctrlWrapper(logoutUser),
 };
