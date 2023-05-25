@@ -2,7 +2,6 @@ const { User, JoiScheme } = require("../models/user-schema");
 const { HttpError } = require("../helpers/httpError");
 const { ctrlWrapper } = require("../decorators/ctrlWrapper");
 const jwt = require("jsonwebtoken");
-// require("dotenv").config;
 
 const bcrypt = require("bcryptjs");
 
