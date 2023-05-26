@@ -52,12 +52,53 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
   const { _id } = req.user;
+  if (!_id) {
+    throw HttpError(401);
+  }
   await User.findByIdAndUpdate(_id, { token: "" });
   res.json({ message: " Successfully logged out" });
+};
+
+const currentUser = async (req, res) => {
+  const { _id, email, subscription } = req.user;
+  if (!_id) {
+    throw HttpError(401);
+  }
+  res.json({ email, subscription });
+};
+
+const updateSubscription = async (req, res) => {
+  const { _id } = req.user;
+  if (!_id) {
+    throw HttpError(401);
+  }
+
+  const { error } = JoiScheme.updateSubscription.validate(req.body, {
+    abortEarly: false,
+  });
+  if (error) {
+    throw HttpError(400, "Missing field");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      subscription: req.body.subscription,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!updatedUser) {
+    throw HttpError(404);
+  }
+  res.json(updatedUser);
 };
 
 module.exports = {
   registerUser: ctrlWrapper(registerUser),
   loginUser: ctrlWrapper(loginUser),
   logoutUser: ctrlWrapper(logoutUser),
+  currentUser: ctrlWrapper(currentUser),
+  updateSubscription: ctrlWrapper(updateSubscription),
 };

@@ -33,6 +33,9 @@ const JoiScheme = {
     email: Joi.string().required().email(),
     password: Joi.string().required().min(6),
   }),
+  updateSubscription: Joi.object({
+    subscription: Joi.string().required().valid("starter", "pro", "business"),
+  }),
 };
 
 const User = model("User", userSchema);

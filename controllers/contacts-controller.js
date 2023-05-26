@@ -9,6 +9,22 @@ const fetchAllContacts = async (req, res) => {
   res.json(contacts);
 };
 
+const filterUserByFavourite = async (req, res, next) => {
+  const { _id } = req.user;
+  if (!_id) {
+    throw HttpError(401);
+  }
+  const { favourite } = req.query;
+  if (!favourite) {
+    return next();
+  }
+  const favouriteContacts = await Contact.find({
+    favorite: favourite,
+    owner: _id,
+  });
+  res.json(favouriteContacts);
+};
+
 const fetchContactById = async (req, res) => {
   const id = req.params.contactId;
   const contactById = await Contact.findById(id);
@@ -78,4 +94,5 @@ module.exports = {
   addTheContact: ctrlWrapper(addTheContact),
   updateTheContact: ctrlWrapper(updateTheContact),
   updateFavorite: ctrlWrapper(updateFavorite),
+  filterUserByFavourite: ctrlWrapper(filterUserByFavourite),
 };

@@ -7,10 +7,11 @@ const {
   deleteContact,
   updateFavorite,
   updateTheContact,
+  filterUserByFavourite,
 } = require("../../controllers/contacts-controller");
 const authenticate = require("../../middlewares/authenticate");
 
-router.get("/", authenticate, fetchAllContacts);
+router.get("/", authenticate, filterUserByFavourite, fetchAllContacts);
 router.get("/:contactId", authenticate, fetchContactById);
 router.delete("/:contactId", authenticate, deleteContact);
 router.post("/", authenticate, addTheContact);
