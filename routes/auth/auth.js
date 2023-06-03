@@ -6,12 +6,22 @@ const {
   logoutUser,
   currentUser,
   updateSubscription,
+  updateAvatar,
 } = require("../../controllers/user-controller");
 const authenticate = require("../../middlewares/authenticate");
+const upload = require("../../middlewares/upload");
+const changeAvatar = require("../../middlewares/changeAvatar");
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", authenticate, logoutUser);
 router.get("/current", authenticate, currentUser);
 router.patch("/", authenticate, updateSubscription);
+router.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  changeAvatar,
+  updateAvatar
+);
 module.exports = router;

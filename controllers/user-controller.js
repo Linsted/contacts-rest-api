@@ -2,6 +2,9 @@ const { User, JoiScheme } = require("../models/user-schema");
 const { HttpError } = require("../helpers/httpError");
 const { ctrlWrapper } = require("../decorators/ctrlWrapper");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const fs = require("fs/promises");
+const path = require("path");
 
 const bcrypt = require("bcryptjs");
 
@@ -15,9 +18,14 @@ const registerUser = async (req, res) => {
   if (error) {
     throw HttpError(400, "Missing required field");
   }
-
+  const avatarURL = gravatar.url(req.body.email);
+  console.log(avatarURL);
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  const newUser = await User.create({ ...req.body, password: hashedPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashedPassword,
+    avatarURL,
+  });
   res.status(201).json({ message: `User ${newUser.email} registered` });
 };
 
@@ -95,10 +103,27 @@ const updateSubscription = async (req, res) => {
   res.json(updatedUser);
 };
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempPath, filename } = req.file;
+  if (!_id) {
+    throw HttpError(401);
+  }
+  const newPath = path.join(__dirname, "..", "public", "avatars");
+  await fs.rename(tempPath, `${newPath}/${filename}`);
+  const avatarURL = path.join(__dirname, "..", "public", "avatars", filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+  res.json({
+    avatarURL,
+    message: "Avatar updated successfully",
+  });
+};
+
 module.exports = {
   registerUser: ctrlWrapper(registerUser),
   loginUser: ctrlWrapper(loginUser),
   logoutUser: ctrlWrapper(logoutUser),
   currentUser: ctrlWrapper(currentUser),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
