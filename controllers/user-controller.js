@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const fs = require("fs/promises");
 const path = require("path");
+const { nanoid } = require("nanoid");
 
 const bcrypt = require("bcryptjs");
 
@@ -25,9 +26,23 @@ const registerUser = async (req, res) => {
     ...req.body,
     password: hashedPassword,
     avatarURL,
+    verificationToken: nanoid()
   });
   res.status(201).json({ message: `User ${newUser.email} registered` });
 };
+
+const verifyUser = async (req, res) => {
+
+  const { verificationToken } = req.params;
+
+
+  const user = await User.findOne({ verificationToken })
+  if (!user) { throw HttpError(404, "User not found") };
+
+  await User.findOneAndUpdate({ verificationToken }, { verificationToken: null })
+
+  res.json("Verification successful");
+}
 
 const loginUser = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
@@ -126,4 +141,5 @@ module.exports = {
   currentUser: ctrlWrapper(currentUser),
   updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
+  verifyUser: ctrlWrapper(verifyUser),
 };
