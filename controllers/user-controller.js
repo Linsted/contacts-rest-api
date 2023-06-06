@@ -6,11 +6,13 @@ const gravatar = require("gravatar");
 const fs = require("fs/promises");
 const path = require("path");
 const { nanoid } = require("nanoid");
+const emailVerificationSender = require("../helpers/emailSender");
 
 const bcrypt = require("bcryptjs");
 
 const registerUser = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+  const { email } = req.body;
+  const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, "User already exists");
   }
@@ -19,40 +21,54 @@ const registerUser = async (req, res) => {
   if (error) {
     throw HttpError(400, "Missing required field");
   }
-  const avatarURL = gravatar.url(req.body.email);
-  console.log(avatarURL);
+  const avatarURL = gravatar.url(email);
+
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const verificationToken = nanoid();
   const newUser = await User.create({
     ...req.body,
     password: hashedPassword,
     avatarURL,
-    verificationToken: nanoid()
+    verificationToken
   });
-  res.status(201).json({ message: `User ${newUser.email} registered` });
+
+  await emailVerificationSender(email, verificationToken);
+
+  res.status(201).json({ message: `User ${newUser.email} registered. Please check your email to verify account.` });
 };
+
+
+
+
+
 
 const verifyUser = async (req, res) => {
 
   const { verificationToken } = req.params;
 
 
-  const user = await User.findOne({ verificationToken })
+  const user = await User.findOne({ verificationToken });
   if (!user) { throw HttpError(404, "User not found") };
 
-  await User.findOneAndUpdate({ verificationToken }, { verificationToken: null })
+  await User.findOneAndUpdate({ verificationToken }, { verificationToken: null, verify: true });
+
 
   res.json("Verification successful");
-}
+};
 
 const loginUser = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
+  console.log(user)
   if (!user) {
     throw HttpError(401, "Email or password not found");
-  }
+  };
+
   const validPassword = await bcrypt.compare(req.body.password, user.password);
   if (!validPassword) {
     throw HttpError(401, "Email or password not found");
-  }
+  };
+
+  if (!user.verify) { throw HttpError(403, "User is not verified!") }
 
   const { error } = JoiScheme.loginUser.validate(req.body);
   if (error) {
