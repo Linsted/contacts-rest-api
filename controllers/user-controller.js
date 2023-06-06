@@ -56,6 +56,20 @@ const verifyUser = async (req, res) => {
   res.json("Verification successful");
 };
 
+const resendEmailVerification = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) { throw HttpError(404, "User not found") };
+  if (user.verify) { throw HttpError(400, "Verification has already been passed") };
+  const { verificationToken } = user;
+  await emailVerificationSender(email, verificationToken);
+
+  res.json("Verification email sent");
+
+};
+
+
+
 const loginUser = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   console.log(user)
@@ -158,4 +172,5 @@ module.exports = {
   updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
   verifyUser: ctrlWrapper(verifyUser),
+  resendEmailVerification: ctrlWrapper(resendEmailVerification),
 };
