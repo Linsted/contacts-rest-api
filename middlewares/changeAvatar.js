@@ -10,7 +10,7 @@ const changeAvatar = async (req, res, next) => {
   console.log("in changeAvatar", req.file);
   Jimp.read(path, (err, avatar) => {
     if (err) throw err;
-    avatar.resize(250, 250).writeAsync(path); // save
+    avatar.resize(250, 250).writeAsync(path);
   });
   next();
 };
