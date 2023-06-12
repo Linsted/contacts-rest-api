@@ -13,6 +13,7 @@ Link to deploy - https://contactsdb-1215.onrender.com
 - Express.js
 - MongoDB
 - Mongoose
+- Docker
 - JWT authentification
 - Multer
 - SendGrid
